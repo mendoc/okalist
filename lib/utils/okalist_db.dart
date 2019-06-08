@@ -35,10 +35,21 @@ class OkalistDB {
     print("Une liste a été enregistrée : $liste");
   }
 
+  Future<void> deleteListe(Liste liste) async {
+    final Database db = await _getDB();
+
+    if (liste.id == null) return;
+
+    await db.delete("liste", where: "id = ?", whereArgs: [liste.id]);
+
+    print("Une liste a été supprimée : $liste");
+  }
+
   Future<List<Liste>> allListe() async {
     final Database db = await _getDB();
 
-    List<Map<String, dynamic>> listesMap = await db.query("liste", orderBy: "id desc");
+    List<Map<String, dynamic>> listesMap =
+        await db.query("liste", orderBy: "id desc");
 
     return List.generate(listesMap.length, (index) {
       return Liste(

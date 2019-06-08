@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:okalist/model/liste.dart';
+import 'package:okalist/route/scan.dart';
 import 'package:okalist/utils/master.dart';
 import 'package:okalist/utils/okalist_db.dart';
 
@@ -67,6 +68,12 @@ class _HomeState extends State<Home> {
         });
   }
 
+  void deleteListe(Liste liste) {
+    okalistDB.deleteListe(liste).whenComplete((){
+      updateListe();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,7 +126,43 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ScanScreen(liste: liste)));
+                        },
+                        onLongPress: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                String intitule = liste.intitule;
+                                return AlertDialog(
+                                  title: Text("Suppression de la liste"),
+                                  content: Text(
+                                      "Voulez-vous vraiment supprimer la liste \"$intitule\" ?"),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text(
+                                        "Annuler",
+                                      ),
+                                      textTheme: ButtonTextTheme.normal,
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    FlatButton(
+                                      child: Text(
+                                        "Supprimer",
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                      onPressed: () {
+                                        deleteListe(liste);
+                                        Navigator.of(context).pop();
+                                      },
+                                    )
+                                  ],
+                                );
+                              });
+                        },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 20.0, horizontal: 8.0),
@@ -139,7 +182,8 @@ class _HomeState extends State<Home> {
                                 child: Row(
                                   children: <Widget>[
                                     Padding(
-                                      padding: const EdgeInsets.only(right: 3.0),
+                                      padding:
+                                          const EdgeInsets.only(right: 3.0),
                                       child: Icon(
                                         Icons.watch_later,
                                         color: Colors.grey,
@@ -161,7 +205,11 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
-                    (liste == snap.data.last) ? Container(height: 80.0,) : Container()
+                    (liste == snap.data.last)
+                        ? Container(
+                            height: 80.0,
+                          )
+                        : Container()
                   ],
                 );
               },
