@@ -82,11 +82,14 @@ class _HomeState extends State<Home> {
           Center(
               child: Padding(
             padding: const EdgeInsets.only(right: 15.0),
-            child: Text(
-              "$nb_listes",
-              style: TextStyle(
-                fontFamily: "Worksans",
-                fontSize: 18.0,
+            child: Visibility(
+              visible: (nb_listes > 0) ? true : false,
+              child: Text(
+                "$nb_listes",
+                style: TextStyle(
+                  fontFamily: "Worksans",
+                  fontSize: 18.0,
+                ),
               ),
             ),
           ))
@@ -101,7 +104,7 @@ class _HomeState extends State<Home> {
       body: FutureBuilder<List<Liste>>(
         future: listesFuture,
         builder: (context, snap) {
-          if (snap.data == null) {
+          if (snap.data == null || snap.data.length == 0) {
             return Center(
               child: Text(
                 "Aucune liste trouvée",
@@ -225,9 +228,9 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
-                child: Icon(Icons.add),
+                child: Icon(Icons.view_list, size: 15.0,),
               ),
-              Text("Ajouter"),
+              Text("Ajouter une liste", style: TextStyle(fontSize: 12.0, fontFamily: "WorkSans"),),
             ],
           )),
     );

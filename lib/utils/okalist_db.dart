@@ -1,4 +1,5 @@
 import 'package:okalist/model/liste.dart';
+import 'package:okalist/model/nom.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -13,14 +14,17 @@ class OkalistDB {
 
   Future<Database> _getDB() async {
     return openDatabase(
-        join(
-          await getDatabasesPath(),
-          "okalist_databse.db",
-        ),
-        version: 1, onCreate: (db, version) {
-      print("Création de la base de données");
-      return db.execute(Constant.CREATE_DB);
-    });
+      join(
+        await getDatabasesPath(),
+        "okalist_databse.db",
+      ),
+      version: 1,
+      onCreate: (db, version) {
+        print("Création de la base de données");
+        db.execute(Constant.CREATE_LISTE_DB);
+        db.execute(Constant.CREATE_NOM_DB);
+      },
+    );
   }
 
   Future<void> createListe(Liste liste) async {
@@ -33,6 +37,18 @@ class OkalistDB {
     );
 
     print("Une liste a été enregistrée : $liste");
+  }
+
+  Future<void> createNom(Nom nom) async {
+    final Database db = await _getDB();
+
+    await db.insert(
+      "nom",
+      nom.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    print("Un nom a été enregistré : $nom");
   }
 
   Future<void> deleteListe(Liste liste) async {
@@ -56,6 +72,22 @@ class OkalistDB {
         id: listesMap[index]["id"],
         intitule: listesMap[index]["intitule"],
         timestamp: listesMap[index]["timestamp"],
+      );
+    });
+  }
+
+  Future<List<Nom>> allNoms(int liste_id) async {
+    final Database db = await _getDB();
+
+    List<Map<String, dynamic>> nomsMap =
+        await db.query("nom", where: "liste = $liste_id", orderBy: "nom");
+
+    return List.generate(nomsMap.length, (index) {
+      return Nom(
+        id: nomsMap[index]["id"],
+        nomcomplet: nomsMap[index]["nom"],
+        liste: nomsMap[index]["liste"],
+        timestamp: nomsMap[index]["timestamp"],
       );
     });
   }
