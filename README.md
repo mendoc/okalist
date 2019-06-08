@@ -1,6 +1,6 @@
 # okalist
 
-Une application pour créer des listes nomminatives.
+Une application pour créer des listes nominatives.
 
 ## Getting Started
 
